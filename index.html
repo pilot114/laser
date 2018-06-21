@@ -24,13 +24,13 @@
             }
         );
     };
-
     connection.open();
+
 
     var config = {
         type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 800,
         physics: {
             default: 'arcade',
             arcade: {
@@ -39,11 +39,22 @@
         },
         scene: {
             preload: preload,
-            create: create
+            create: create,
+            update: update
         }
     };
 
     var game = new Phaser.Game(config);
+
+    var frame = 0;
+
+    function update (ms) {
+        frame++;
+        // раз в 50 мс с хорошей погрешностью
+        if (frame % 3 == 0) {
+            connection.session.publish('com.myapp.hello', ['ttest']);
+        }
+    }
 
     function preload ()
     {
