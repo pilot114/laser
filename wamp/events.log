@@ -1,0 +1,26 @@
+2018/06/21 22:01:36 Starting router
+2018/06/21 22:01:36 Added realm: nexus.reaml1
+2018/06/21 22:01:36 Allowing origins matching: *
+2018/06/21 22:01:36 Listening for websocket connections on ws://127.0.0.1:8080/
+2018/06/21 22:01:46 Aborting client connection: could not authenticate with any method
+2018/06/21 22:01:46 Error attaching to router: authentication error: could not authenticate with any method
+2018/06/21 22:06:55 Aborting client connection: could not authenticate with any method
+2018/06/21 22:06:55 Error attaching to router: authentication error: could not authenticate with any method
+2018/06/21 22:08:07 Aborting client connection: could not authenticate with any method
+2018/06/21 22:08:07 Error attaching to router: authentication error: could not authenticate with any method
+2018/06/21 22:08:18 Aborting client connection: could not authenticate with any method
+2018/06/21 22:08:18 Error attaching to router: authentication error: could not authenticate with any method
+2018/06/21 22:08:22 Aborting client connection: could not authenticate with any method
+2018/06/21 22:08:22 Error attaching to router: authentication error: could not authenticate with any method
+2018/06/21 22:16:15 Shutting down router...
+2018/06/21 22:16:15 Realm nexus.reaml1 completed shutdown
+2018/06/21 22:16:15 Router stopped
+2018/06/21 22:16:17 Starting router
+2018/06/21 22:16:17 Added realm: nexus.reaml1
+2018/06/21 22:16:17 Allowing origins matching: *
+2018/06/21 22:16:17 Listening for websocket connections on ws://127.0.0.1:8080/
+2018/06/21 22:16:43 Lost 3193128366960401
+2018/06/21 22:19:00 Lost 5831694686035749
+2018/06/21 22:19:06 Shutting down router...
+2018/06/21 22:19:06 Realm nexus.reaml1 completed shutdown
+2018/06/21 22:19:06 Router stopped

@@ -1,0 +1,26 @@
+{
+  "websocket": {
+    "address": "127.0.0.1:8080",
+    "cert_file": "",
+    "key_file": "",
+    "allow_origins": ["*"]
+  },
+  "rawsocket": {
+    "tcp_address": "",
+    "tcp_keepalive_interval": 180000000000,
+    "unix_address": "",
+    "max_msg_len": 0
+  },
+  "log_path": "./events.log",
+  "router": {
+    "realms": [
+      {
+        "uri": "nexus.reaml1",
+        "strict_uri": false,
+        "allow_disclose": true,
+        "anonymous_auth": true
+      }
+    ],
+    "debug": false
+  }
+}
