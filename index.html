@@ -4,6 +4,7 @@
     <script src="./vendor/autobahn.min.js"></script>
 </head>
 <body>
+    <div id="info"></div>
 <script>
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -19,26 +20,33 @@
     }
 
     let avg = {
-        count: 0,
         sequence: [],
         val: function(){
-            return Math.floor(this.sequence.reduce((a, b) => a + b, 0) / this.count);
-        },
+            return Math.floor(this.sequence.reduce((a, b) => a + b, 0) / this.sequence.length);
+        }
     };
+    let frame = 0;
+    let incomingBytes = 0;
 
-    var connectionReciever = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
-    var connectionSender = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
+    let connectionReciever = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
+    let connectionSender = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
 
-    connectionReciever.onopen = function (session) {
+    connectionReciever.onopen = function (session, details) {
 
+        // инжектим в сокет свои обработчик для получение размера входящих фреймов
+        let soc = connectionReciever.session._socket;
+        let oldHandler = soc.onmessage;
+        soc.onmessage = function(event){
+            oldHandler(event);
+            incomingBytes += JSON.stringify(event).length;
+        };
+
+        // https://github.com/crossbario/autobahn-js/blob/master/doc/reference.md#session-properties
         session.subscribe('test', function(args) {
 
             send(args).then(function(args){
                 let delay = frame - args[1];
-                // console.log("Frame delay:", delay);
                 avg.sequence.push(delay);
-                avg.count++;
-                console.log("Avg delay:", avg.val());
             });
         });
     };
@@ -57,10 +65,10 @@
     connectionSender.open();
 
 
-    var config = {
+    let config = {
         type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        width: 1,
+        height: 1,
         physics: {
             default: 'arcade',
             arcade: {
@@ -73,9 +81,7 @@
             update: update
         }
     };
-    var game = new Phaser.Game(config);
-
-    var frame = 0;
+    let game = new Phaser.Game(config);
 
     function update (ms) {
         frame++;
@@ -83,6 +89,13 @@
         // if (frame % 3 == 0) {
             connectionSender.session.publish('test', ['im sender', frame]); // + avg даст предсказание
         // }
+
+        //
+        document.getElementById('info').innerHTML = JSON.stringify({
+            'frame' : frame,
+            'incomingBytes' : incomingBytes,
+            'avgFrameDelay' : avg.val(),
+        })
     }
 
     function preload ()
