@@ -19,14 +19,20 @@
         return data;
     }
 
-    let avg = {
-        sequence: [],
-        val: function(){
-            return Math.floor(this.sequence.reduce((a, b) => a + b, 0) / this.sequence.length);
-        }
-    };
-    let frame = 0;
-    let incomingBytes = 0;
+    // debug data
+    let debug = {
+        avg : {
+            sequence: [],
+            frameDelay: function(){
+                return Math.round(this.sequence.reduce((a, b) => a + b, 0) / this.sequence.length);
+            },
+            msDelay: function(){
+                return Math.round((1000/60) * this.frameDelay()) + 'ms';
+            }
+        },
+        frame : 0,
+        incomingBytes : 0
+    }
 
     let connectionReciever = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
     let connectionSender = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
@@ -38,15 +44,16 @@
         let oldHandler = soc.onmessage;
         soc.onmessage = function(event){
             oldHandler(event);
-            incomingBytes += JSON.stringify(event).length;
+            debug.incomingBytes += JSON.stringify(event).length;
         };
 
         // https://github.com/crossbario/autobahn-js/blob/master/doc/reference.md#session-properties
         session.subscribe('test', function(args) {
 
             send(args).then(function(args){
-                let delay = frame - args[1];
-                avg.sequence.push(delay);
+                // модуль числа
+                let delay = debug.frame - args[1] * Math.floor(debug.frame / args[1]);
+                debug.avg.sequence.push(delay);
             });
         });
     };
@@ -54,6 +61,13 @@
 
 
     connectionSender.onopen = function (session) {
+
+        let soc = connectionSender.session._socket;
+        let oldHandler = soc.onmessage;
+        soc.onmessage = function(event){
+            oldHandler(event);
+            console.log();
+        };
 
         session.subscribe('test', function(args) {
 
@@ -84,17 +98,18 @@
     let game = new Phaser.Game(config);
 
     function update (ms) {
-        frame++;
+        debug.frame++;
         // раз в 50 мс с хорошей погрешностью
-        // if (frame % 3 == 0) {
-            connectionSender.session.publish('test', ['im sender', frame]); // + avg даст предсказание
-        // }
+        if (debug.frame % 3 == 0) {
+            connectionSender.session.publish('test', ['im sender', debug.frame]); // + avg даст предсказание
+        }
 
         //
         document.getElementById('info').innerHTML = JSON.stringify({
-            'frame' : frame,
-            'incomingBytes' : incomingBytes,
-            'avgFrameDelay' : avg.val(),
+            'frame' : debug.frame,
+            'incomingBytes' : debug.incomingBytes,
+            'avgFrameDelay' : debug.avg.frameDelay(),
+            'avgMsDelay' : debug.avg.msDelay()
         })
     }
 
