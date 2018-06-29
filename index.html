@@ -15,7 +15,7 @@
         let min = 50;
         let max = 500;
         let ms = Math.floor(Math.random() * (max - min) + min);
-        await sleep(ms);
+        // await sleep(ms);
         return data;
     }
 
@@ -30,12 +30,15 @@
                 return Math.round((1000/60) * this.frameDelay()) + 'ms';
             }
         },
+        max: {
+            frameDelay: 0
+        },
         frame : 0,
         incomingBytes : 0
-    }
+    };
 
-    let connectionReciever = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
-    let connectionSender = new autobahn.Connection({url: 'ws://127.0.0.1:8080/', realm: 'nexus.reaml1'});
+    let connectionReciever = new autobahn.Connection({url: 'ws://85.143.212.43:8080/', realm: 'nexus.reaml1'});
+    let connectionSender = new autobahn.Connection({url: 'ws://85.143.212.43:8080/', realm: 'nexus.reaml1'});
 
     connectionReciever.onopen = function (session, details) {
 
@@ -54,6 +57,9 @@
                 // модуль числа
                 let delay = debug.frame - args[1] * Math.floor(debug.frame / args[1]);
                 debug.avg.sequence.push(delay);
+                if (delay > debug.max.frameDelay) {
+                    debug.max.frameDelay = delay;
+                }
             });
         });
     };
@@ -101,14 +107,14 @@
         debug.frame++;
         // раз в 50 мс с хорошей погрешностью
         if (debug.frame % 3 == 0) {
-            connectionSender.session.publish('test', ['im sender', debug.frame]); // + avg даст предсказание
+            connectionSender.session.publish('test', ['im sender', debug.frame]);
         }
 
-        //
         document.getElementById('info').innerHTML = JSON.stringify({
             'frame' : debug.frame,
             'incomingBytes' : debug.incomingBytes,
             'avgFrameDelay' : debug.avg.frameDelay(),
+            'maxFrameDelay' : debug.max.frameDelay,
             'avgMsDelay' : debug.avg.msDelay()
         })
     }
